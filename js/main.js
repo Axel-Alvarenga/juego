@@ -3,22 +3,20 @@ const RENDER_H = 270;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
 
-function resize() {
-  canvas.width  = RENDER_W;
-  canvas.height = RENDER_H;
-  ctx.imageSmoothingEnabled = false;
-}
-window.addEventListener('resize', resize);
-resize();
+canvas.width  = RENDER_W;
+canvas.height = RENDER_H;
+// Debe ir DESPUÉS de fijar el tamaño: asignar width reinicia el contexto
+ctx.imageSmoothingEnabled = false;
 
 let world;
 let entityManager;
 let camera = { x: 0, y: 0, viewW: RENDER_W, viewH: RENDER_H };
+const particles = [];
 
 const player = new Player(0, 0); 
 const knowledge = new Knowledge();
+knowledge.attachClock(() => world.getClock());
 const journal = new Journal(knowledge);
 const inventory = new Inventory(10);
 const craftPanel = new CraftPanel();
@@ -44,9 +42,11 @@ function reloadWorld(isHub) {
   player.isChopping = false; player.chopTarget = null;
   player.isMining = false; player.mineTarget = null;
   player.abortCraft();
+  player.knownPortalPos = null;
+  player.entityCooldowns.clear();
+  particles.length = 0;
   player.currentIntent = isHub ? '¡Un mundo tranquilo!' : '¿Dónde estoy?';
   player.triggeredPortal = false;
-  player.needThought = null;
 
   const worldTileX = (player.x + player.size / 2) / TILE_SIZE;
   const worldTileY = (player.y + player.size / 2) / TILE_SIZE;
@@ -76,8 +76,6 @@ function updateCamera() {
   camera.x = Math.floor(iso.px - camera.viewW / 2);
   camera.y = Math.floor(iso.py - camera.viewH / 2 - player.heightPx);
 }
-
-const particles = [];
 
 function spawnFireParticles(dt, em) {
   for (const e of em.entities) {
@@ -130,10 +128,7 @@ function loop(now) {
   entityManager.update(dt, player);
   updateCamera();
 
-  if (player.triggeredPortal) {
-    reloadWorld(false);
-    return;
-  }
+  if (player.triggeredPortal) reloadWorld(false);
 
   spawnFireParticles(dt, entityManager);
   spawnSnowParticles(dt, world, camera);

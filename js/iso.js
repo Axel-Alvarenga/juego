@@ -9,17 +9,9 @@ const SPRITE_H = ISO_H + SPRITE_PAD_TOP + SPRITE_PAD_BOTTOM;
 function isoToScreen(x, y) { return { px: (x - y) * (ISO_W / 2), py: (x + y) * (ISO_H / 2) }; }
 function screenToIso(px, py) { return { x: (px / (ISO_W / 2) + py / (ISO_H / 2)) / 2, y: (py / (ISO_H / 2) - px / (ISO_W / 2)) / 2 }; }
 
-function drawDiamond(ctx, px, py, color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(px, py - ISO_H / 2); ctx.lineTo(px + ISO_W / 2, py);
-  ctx.lineTo(px, py + ISO_H / 2); ctx.lineTo(px - ISO_W / 2, py);
-  ctx.closePath(); ctx.fill();
-}
-
 const tileSpriteCache = new Map();
 
-function createTileBlock(tile, topColor, darkColor, sideColor, variantSeed) {
+function createTileBlock(tile, variantSeed) {
   const canvas = document.createElement('canvas');
   canvas.width = SPRITE_W; canvas.height = SPRITE_H;
   const c = canvas.getContext('2d');
@@ -30,10 +22,12 @@ function createTileBlock(tile, topColor, darkColor, sideColor, variantSeed) {
     return s - Math.floor(s);
   };
 
-  let cTop = topColor, cDark = darkColor, cSide = sideColor;
+  let cTop, cDark, cSide;
   
   // 🎨 PALETA DE COLORES
-  if (tile === TILE.GRASS) {
+  if (tile === TILE.SAND) {
+    cTop = '#fce38a'; cDark = '#e6c87a'; cSide = '#c2a255';
+  } else if (tile === TILE.GRASS) {
     const jitter = Math.floor(rnd(99) * 10) - 5;
     cTop = `hsl(${75 + jitter}, 75%, ${55 + jitter}%)`;
     cDark = `hsl(${85 + jitter}, 60%, ${35 + jitter}%)`;
@@ -128,11 +122,11 @@ function createTileBlock(tile, topColor, darkColor, sideColor, variantSeed) {
   return { canvas, anchorY: cy };
 }
 
-function getTileSprite(tile, heightPx, variant) {
+function getTileSprite(tile, variant) {
   const key = `${tile}_${variant}`;
   let sprite = tileSpriteCache.get(key);
   if (sprite) return sprite;
-  sprite = createTileBlock(tile, '#ffffff', '#000000', '#888888', variant);
+  sprite = createTileBlock(tile, variant);
   tileSpriteCache.set(key, sprite);
   return sprite;
 }

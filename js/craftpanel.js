@@ -139,7 +139,7 @@ class CraftPanel {
     const ix = sx + padding + offsetX;
     const iy = sy + padding + offsetY;
 
-    Inventory.prototype.drawItemIcon.call(null, ctx, item, ix, iy, inner);
+    drawItemIcon(ctx, item, ix, iy, inner);
 
     // ⚠️ SOLO DIBUJAR CANTIDAD SI ES MAYOR A 1
     if (quantity > 1) {

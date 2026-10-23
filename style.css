@@ -20,10 +20,9 @@ body {
 /* El canvas se estira al tamaño de la pantalla manteniendo aspect ratio */
 canvas {
   display: block;
-  width: 100vw;
-  height: 100vh;
-  object-fit: contain;      /* mantiene aspect ratio */
+  width: min(100vw, calc(100vh * 16 / 9));  /* 480x270 = 16:9 */
+  height: auto;
+  aspect-ratio: 480 / 270;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
   background: #0b1220;
 }

@@ -159,29 +159,29 @@ class Entity {
     if (this.type === ENTITY_TYPE.STONE_PICKUP) { this.harvested = true; drops.STONE = 1; return { success: true, drops }; }
     
     if (this.type === ENTITY_TYPE.CHICKEN) {
-      if (toolId === 'SWORD_BASIC') { this.alive = false; drops.MEAT = 1; drops.FEATHER = 1; return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito algo afilado' };
+      if (toolId === 'SWORD_BASIC') { this.alive = false; drops.MEAT = 1; return { success: true, drops }; }
+      return { success: false, drops };
     }
     if (this.type === ENTITY_TYPE.SLIME) {
       if (toolId === 'SWORD_BASIC') { this.alive = false; drops.SLIME_GEL = 1; return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito un arma' };
+      return { success: false, drops };
     }
     if (this.type === ENTITY_TYPE.SPIDER) {
-      if (toolId === 'SWORD_BASIC') { this.alive = false; drops.SPIDER_EYE = 1; return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito un arma' };
+      if (toolId === 'SWORD_BASIC') { this.alive = false; return { success: true, drops }; }
+      return { success: false, drops };
     }
     if (this.type === ENTITY_TYPE.GOBLIN) {
-      if (toolId === 'SWORD_BASIC') { this.alive = false; drops.GOLD_COIN = 1; return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito un arma' };
+      if (toolId === 'SWORD_BASIC') { this.alive = false; return { success: true, drops }; }
+      return { success: false, drops };
     }
     
     if (this.type === ENTITY_TYPE.TREE) {
       if (toolId === 'HACHA_TOSCA') { return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito un hacha' };
+      return { success: false, drops };
     }
     if (this.type === ENTITY_TYPE.ROCK) {
       if (toolId === 'PICO_TOSCO') { return { success: true, drops }; }
-      return { success: false, drops, reason: 'necesito un pico' };
+      return { success: false, drops };
     }
     return { success: false, drops };
   }
@@ -297,22 +297,4 @@ class EntityManager {
   }
 
   update(dt, player) { for (const e of this.entities) e.update(dt, player, this.world); }
-  findNearestOfType(type, px, py, radius) {
-    let best = null, bestDist = radius;
-    for (const e of this.entities) {
-      if (e.type !== type || !e.alive || e.harvested) continue;
-      const d = e.distanceTo(px, py);
-      if (d < bestDist) { bestDist = d; best = e; }
-    }
-    return best;
-  }
-  findNearestAny(px, py, radius) {
-    let best = null, bestDist = radius;
-    for (const e of this.entities) {
-      if (!e.alive || e.harvested) continue;
-      const d = e.distanceTo(px, py);
-      if (d < bestDist) { bestDist = d; best = e; }
-    }
-    return best;
-  }
 }

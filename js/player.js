@@ -22,7 +22,6 @@ class Player {
     this.inventoryOpen = 0;
     this.currentIntent = '';
     
-    this.needThought = null;
 
     this.inventory = null;
     this.knowledge = null;
@@ -32,14 +31,13 @@ class Player {
 
     this.seenTileTypes = new Set();
     this.seenEntityTypes = new Set();
-    this.hasSeenChicken = false;
 
     this.target = null;
     this.targetDuration = 0;
 
     this.craftState = 'idle';
     this.craftTimer = 0; this.craftStateTimer = 0;
-    this.craftItemA = null; this.craftItemB = null; this.craftResult = null;
+    this.craftItemA = null; this.craftItemB = null;
     this.craftTargetResult = null;
     this.craftExcludeResults = [];
 
@@ -57,7 +55,6 @@ class Player {
     this.lastX = x; this.lastY = y;
     this.entityCooldowns = new Map();
     this.walkAnim = 0;
-    this.fireCooldown = 0;
     this.damageFlash = 0;
     this.isFleeing = false;
     
@@ -66,7 +63,6 @@ class Player {
 
     this.invulnerableTimer = 0;
 
-    this.tileNames = { 0: 'agua profunda', 1: 'agua', 2: 'arena', 3: 'hierba', 4: 'bosque', 5: 'tundra', 6: 'montaña', 7: 'nieve' };
   }
 
   attachInventory(inv) { this.inventory = inv; }
@@ -83,7 +79,7 @@ class Player {
 
   abortCraft() {
     this.craftState = 'idle'; this.craftTimer = 0; this.craftStateTimer = 0;
-    this.craftItemA = null; this.craftItemB = null; this.craftResult = null; this.craftTargetResult = null;
+    this.craftItemA = null; this.craftItemB = null; this.craftTargetResult = null;
     this.craftExcludeResults = [];
     this.currentIntent = ''; this.thinkTimer = 0;
     if (this.craftPanel) this.craftPanel.close();
@@ -162,11 +158,9 @@ class Player {
 
   update(dt, world) {
     if (!this.world) this.world = world;
-    if (this.knowledge) this.knowledge.advanceClock(dt);
     updateCraftCooldowns(dt);
     
     if (this.damageFlash > 0) this.damageFlash -= dt;
-    if (this.fireCooldown > 0) this.fireCooldown -= dt;
     if (this.invulnerableTimer > 0) this.invulnerableTimer -= dt;
     for (const [entity, time] of this.entityCooldowns) {
       const next = time - dt;
@@ -293,7 +287,7 @@ class Player {
     if (this.craftState === 'placing_a') { this.craftState = 'placing_b'; this.craftTimer = 0.3; if (this.craftPanel) this.craftPanel.phase = 'placing_b'; return; }
     if (this.craftState === 'placing_b') { this.craftState = 'thinking'; this.craftTimer = 1.2; if (this.craftPanel) this.craftPanel.goThinking(); return; }
     if (this.craftState === 'thinking') { this.resolveCraft(); return; }
-    if (this.craftState === 'success') { this.craftState = 'idle'; this.craftTimer = 0; this.craftStateTimer = 0; this.thinkTimer = 0; if (this.craftPanel) this.craftPanel.close(); this.craftItemA = null; this.craftItemB = null; this.craftResult = null; this.craftTargetResult = null; this.craftExcludeResults = []; this.currentIntent = ''; return; }
+    if (this.craftState === 'success') { this.craftState = 'idle'; this.craftTimer = 0; this.craftStateTimer = 0; this.thinkTimer = 0; if (this.craftPanel) this.craftPanel.close(); this.craftItemA = null; this.craftItemB = null; this.craftTargetResult = null; this.craftExcludeResults = []; this.currentIntent = ''; return; }
     if (this.craftState === 'fail') { this.craftState = 'idle'; this.craftTimer = 0; this.craftStateTimer = 0; this.thinkTimer = 0; if (this.craftPanel) this.craftPanel.close(); this.craftItemA = null; this.craftItemB = null; this.craftExcludeResults = []; this.currentIntent = 'No ha funcionado...'; return; }
   }
 
@@ -303,7 +297,7 @@ class Player {
       const item = ITEMS[result.result];
       this.knowledge.successfulAttempt(`${this.craftItemA} + ${this.craftItemB} = ${item.name}`, { a: this.craftItemA, b: this.craftItemB, result: result.result });
       this.knowledge.learned(result.recipe.learnText); this.gainXp(2);
-      this.craftResult = result.result; this.craftState = 'success'; this.craftTimer = 1.0;
+      this.craftState = 'success'; this.craftTimer = 1.0;
       if (this.craftPanel) this.craftPanel.showSuccess(result.result);
     } else {
       this.knowledge.failedAttempt(`${this.craftItemA} + ${this.craftItemB}`, { a: this.craftItemA, b: this.craftItemB });
@@ -387,7 +381,6 @@ class Player {
     // 1.2 Comer si tiene hambre
     if (this.hunger > 55 && this.inventory.hasItem('SLIME_GEL')) { this.openInventoryAndUse('SLIME_GEL', 'Comiendo gelatina'); this.hunger = Math.max(0, this.hunger - 20); return; }
     if (this.hunger > 55 && this.inventory.hasItem('MEAT')) { this.openInventoryAndUse('MEAT', 'Comiendo muslito'); this.hunger = Math.max(0, this.hunger - 50); return; }
-    if (this.hunger > 55 && this.inventory.hasItem('APPLE')) { this.openInventoryAndUse('APPLE', 'Comiendo manzana'); this.hunger = Math.max(0, this.hunger - 45); return; }
 
     // 1.3 Refugio si tiene frío
     if (isNight && this.cold > 40) {
@@ -567,7 +560,7 @@ class Player {
     if (!checkTile(px, py)) { px = cx; py = cy - 16; } if (!checkTile(px, py)) { px = cx; py = cy; }
     this.entityManager.placeCampfire(px, py);
     this.knowledge.successfulAttempt('colocar fogata en el suelo', { placed: 'CAMPFIRE' }); this.knowledge.learned('las fogatas se colocan en el suelo');
-    this.currentIntent = 'Coloco una fogata'; this.inventoryOpen = 1.5; this.gainXp(2); this.fireCooldown = 20;
+    this.currentIntent = 'Coloco una fogata'; this.inventoryOpen = 1.5; this.gainXp(2);
   }
 
   isEntityReachable(entity) {
@@ -586,16 +579,6 @@ class Player {
     let best = null, bestDist = radius;
     for (const e of this.entityManager.entities) {
       if (e.type !== type || !e.alive || e.harvested || !this.isEntityReachable(e)) continue;
-      const d = e.distanceTo(px, py);
-      if (d < bestDist) { bestDist = d; best = e; }
-    }
-    return best;
-  }
-
-  findReachableAny(px, py, radius) {
-    let best = null, bestDist = radius;
-    for (const e of this.entityManager.entities) {
-      if (!e.alive || e.harvested || e.type === ENTITY_TYPE.CAMPFIRE || e.type === ENTITY_TYPE.SLIME || e.type === ENTITY_TYPE.PORTAL || !this.isEntityReachable(e)) continue;
       const d = e.distanceTo(px, py);
       if (d < bestDist) { bestDist = d; best = e; }
     }
@@ -627,7 +610,7 @@ class Player {
       this.clampToWorld(world); return;
     }
 
-    if (World.isHub && this.knownPortalPos && !this.needThought) {
+    if (World.isHub && this.knownPortalPos) {
       const playerCx = this.x + this.size / 2, playerCy = this.y + this.size / 2;
       const distToPortal = Math.sqrt((this.knownPortalPos.x - playerCx)**2 + (this.knownPortalPos.y - playerCy)**2);
       
@@ -704,13 +687,11 @@ class Player {
       this.knowledge.failedAttempt('talar un árbol con las manos'); 
       this.currentIntent = 'Necesito un hacha para el árbol'; 
       this.entityCooldowns.set(entity, 15);
-      this.needThought = 'tree';
     }
     else if (entity.type === ENTITY_TYPE.ROCK) { 
       this.knowledge.touched('una piedra'); 
       this.currentIntent = 'Necesito un pico para la piedra'; 
       this.entityCooldowns.set(entity, 15);
-      this.needThought = 'rock';
     }
     else if (entity.type === ENTITY_TYPE.SLIME || entity.type === ENTITY_TYPE.SPIDER || entity.type === ENTITY_TYPE.GOBLIN) { 
       this.currentIntent = '¡Necesito un arma!'; 
@@ -727,7 +708,7 @@ class Player {
     const tx = Math.floor(cx / TILE_SIZE), ty = Math.floor(cy / TILE_SIZE);
     const tile = world.getTile(tx, ty);
     if (tile === null) return;
-    if (!this.seenTileTypes.has(tile)) { this.seenTileTypes.add(tile); this.knowledge.saw(`un terreno de ${this.tileNames[tile] || 'algo desconocido'}`); }
+    if (!this.seenTileTypes.has(tile)) { this.seenTileTypes.add(tile); this.knowledge.saw(`un terreno de ${TILE_NAMES[tile] || 'algo desconocido'}`); }
   }
 
   seeEntities() {
@@ -738,7 +719,6 @@ class Player {
       if (!this.seenEntityTypes.has(e.type)) {
         this.seenEntityTypes.add(e.type);
         this.knowledge.saw(e.config.nameSingular);
-        if (e.type === ENTITY_TYPE.CHICKEN) this.hasSeenChicken = true;
       }
     }
   }
@@ -786,5 +766,4 @@ class Player {
   }
 
   pickRandomDirection() { const angle = Math.random() * Math.PI * 2; this.dirX = Math.cos(angle); this.dirY = Math.sin(angle); }
-  draw(ctx, camera) {}
 }

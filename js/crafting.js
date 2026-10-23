@@ -69,6 +69,11 @@ function executeCraft(inventory, itemA, itemB, targetResult = null, excludeResul
   
   if (!recipe) return { success: false, hint: CRAFTING_HINTS.default };
 
+  // Sin materiales suficientes no se crea nada (también para recetas objetivo)
+  for (const [itemId, qty] of Object.entries(recipe.consumed)) {
+    if (inventory.countOf(itemId) < qty) return { success: false, hint: CRAFTING_HINTS.default };
+  }
+
   for (const [itemId, qty] of Object.entries(recipe.consumed)) {
     for (let i = 0; i < qty; i++) inventory.removeOne(itemId);
   }

@@ -5,31 +5,13 @@ const TILE = {
   FOREST: 4, TUNDRA: 5, STONE: 6, SNOW: 7,
 };
 
-const TILE_COLORS = {
-  [TILE.DEEP_WATER]: '#3d9bf5', [TILE.WATER]: '#59b5ff', [TILE.SAND]: '#fce38a',
-  [TILE.GRASS]: '#b2d44d', [TILE.FOREST]: '#6ba843', [TILE.TUNDRA]: '#9db39d',
-  [TILE.STONE]: '#a8a8a8', [TILE.SNOW]: '#ffffff',
-};
-
-const TILE_COLORS_DARK = {
-  [TILE.DEEP_WATER]: '#2a7bc7', [TILE.WATER]: '#3d9bf5', [TILE.SAND]: '#e6c87a',
-  [TILE.GRASS]: '#8aa83a', [TILE.FOREST]: '#4a7a2e', [TILE.TUNDRA]: '#6e806e',
-  [TILE.STONE]: '#7a7a7a', [TILE.SNOW]: '#dce6f2',
-};
-
 const TILE_HEIGHT_BASE = {
   [TILE.DEEP_WATER]: 0, [TILE.WATER]: 0, [TILE.SAND]: 0,
   [TILE.GRASS]: 1, [TILE.FOREST]: 1, [TILE.TUNDRA]: 1,
   [TILE.STONE]: 3, [TILE.SNOW]: 5,
 };
 
-const TILE_SIDE_COLORS = {
-  [TILE.DEEP_WATER]: '#1e5c9e', [TILE.WATER]: '#2a7bc7', [TILE.SAND]: '#c2a255',
-  [TILE.GRASS]: '#d97a2b', [TILE.FOREST]: '#a85c1e', [TILE.TUNDRA]: '#8c6d55',
-  [TILE.STONE]: '#5c5c5c', [TILE.SNOW]: '#a3b8c9',
-};
-
-const TILE_NAMES = ['Deep water', 'Water', 'Sand', 'Grass', 'Forest', 'Tundra', 'Stone', 'Snow'];
+const TILE_NAMES = ['agua profunda', 'agua', 'arena', 'hierba', 'bosque', 'tundra', 'montaña', 'nieve'];
 const VARIANTS_PER_TILE = 3;
 
 function hash(x, y, seed) {
@@ -65,7 +47,6 @@ class World {
 
     this.generateValidatedWorld();
     this.buildSpriteCache();
-    this.printDistribution();
   }
 
   advanceClock(dt) { this.totalSeconds += dt; }
@@ -97,8 +78,9 @@ class World {
     const visited = new Set([[sx, sy].join(',')]);
     const queue = [[sx, sy]];
     let count = 0;
-    while (queue.length > 0) {
-      const [cx, cy] = queue.shift(); count++;
+    let head = 0;
+    while (head < queue.length) {
+      const [cx, cy] = queue[head++]; count++;
       const ch = this.getTileHeight(cx, cy);
       const neighbors = [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]];
       for (const [nx, ny] of neighbors) {
@@ -200,18 +182,8 @@ class World {
 
   buildSpriteCache() {
     for (let t = 0; t < 8; t++) {
-      for (let v = 0; v < VARIANTS_PER_TILE; v++) getTileSprite(t, 0, v);
+      for (let v = 0; v < VARIANTS_PER_TILE; v++) getTileSprite(t, v);
     }
-  }
-
-  printDistribution() {
-    const counts = {}; let total = 0;
-    for (let y = 0; y < this.height; y++) for (let x = 0; x < this.width; x++) {
-      const t = this.tiles[y][x]; counts[t] = (counts[t] || 0) + 1; total++;
-    }
-    console.log(`--- Distribución del mundo (${World.isHub ? 'HUB' : 'BIOMAS'}) ---`);
-    for (let i = 0; i < TILE_NAMES.length; i++)
-      console.log(`${TILE_NAMES[i].padEnd(12)} ${((counts[i] || 0) / total * 100).toFixed(1)}%`);
   }
 
   getTile(x, y) {
@@ -266,7 +238,7 @@ class World {
         const px = Math.floor(iso.px - camX), py = Math.floor(iso.py - camY);
         const variant = Math.floor(hash(x, y, 7) * VARIANTS_PER_TILE);
         const heightPx = level * (ISO_H / 2);
-        const sprite = getTileSprite(tile, heightPx, variant);
+        const sprite = getTileSprite(tile, variant);
         const drawX = Math.floor(px - ISO_W / 2);
         const drawY = Math.floor(py - sprite.anchorY - heightPx);
         ctx.drawImage(sprite.canvas, drawX, drawY, sprite.canvas.width + OVERLAP, sprite.canvas.height + OVERLAP);

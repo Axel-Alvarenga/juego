@@ -106,26 +106,7 @@ class Journal {
         drawPixelText(ctx, ts, contentX, drawY, '#8a7a5a');
         const tsW = measurePixelText(ts);
 
-        // Texto principal
-        let color = '#e8d8a8';
-        if (line.corrected) color = '#8a7a5a'; // corregida = más apagada
-        else if (line.category === 'creencia') color = '#c8a878'; // creencia = ámbar apagado
-
-        drawPixelText(ctx, line.text, contentX + tsW + 6, drawY, color);
-
-        // Si está corregida, tachado + nota
-        if (line.corrected) {
-          const mainW = measurePixelText(line.text);
-          ctx.fillStyle = '#8a7a5a';
-          ctx.fillRect(contentX + tsW + 6, drawY + 3, mainW, 1);
-
-          // Corrección debajo
-          if (line.correction) {
-            drawY += 8;
-            drawPixelText(ctx, `→ ${line.correction}`,
-              contentX + tsW + 6, drawY, '#6ac87a');
-          }
-        }
+        drawPixelText(ctx, line.text, contentX + tsW + 6, drawY, '#e8d8a8');
       } else if (line.type === 'empty') {
         drawPixelText(ctx, line.text, contentX, drawY, '#6a5a3a');
       } else if (line.type === 'spacer') {
@@ -139,7 +120,7 @@ class Journal {
 
     // --- Pie del panel ---
     const total = this.knowledge.count();
-    const footer = `Descubrimientos: ${total} / ?`;
+    const footer = `Descubrimientos: ${total}`;
     const footerW = measurePixelText(footer);
     drawPixelText(ctx, footer,
       panelX + (panelW - footerW) / 2,
@@ -166,7 +147,6 @@ class Journal {
       'intento_fallido',
       'intento_exitoso',
       'pista',
-      'creencia',
     ];
 
     for (const cat of order) {
@@ -184,9 +164,7 @@ class Journal {
           text: entry.text,
           timestamp: entry.timestamp,
           category: entry.category,
-          corrected: entry.corrected,
-          correction: entry.correction,
-          height: entry.corrected && entry.correction ? 16 : this.lineHeight,
+          height: this.lineHeight,
         });
       }
     }

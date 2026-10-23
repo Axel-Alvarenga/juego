@@ -52,11 +52,11 @@ class DebugPanel {
     // --- Crafting ---
     drawPixelText(ctx, 'CRAFT', x + padding, cy, '#ffd84a');
     cy += 8;
-    drawPixelText(ctx, `st: ${player.craftState}`, x + padding, cy, '#ffffff');
+    drawPixelText(ctx, `estado: ${player.craftState}`, x + padding, cy, '#ffffff');
     cy += lineHeight;
     drawPixelText(ctx, `t: ${player.craftTimer.toFixed(2)}`, x + padding, cy, '#ffffff');
     cy += lineHeight;
-    drawPixelText(ctx, `st: ${player.craftStateTimer.toFixed(2)}`, x + padding, cy, '#ffffff');
+    drawPixelText(ctx, `tiempo: ${player.craftStateTimer.toFixed(2)}`, x + padding, cy, '#ffffff');
     cy += lineHeight + 2;
 
     // --- Cerebro ---
