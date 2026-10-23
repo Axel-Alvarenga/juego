@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pixel Explorer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- 1. Utilidades isométricas y sprites de tiles -->
+  <script src="js/iso.js"></script>
+
+  <!-- 2. Mundo procedural y tiles -->
+  <script src="js/world.js"></script>
+
+  <!-- 3. Fuente pixel art -->
+  <script src="js/pixelfont.js"></script>
+
+  <!-- 4. Sistema de conocimiento de YonyZ -->
+  <script src="js/knowledge.js"></script>
+
+  <!-- 5. Libro del observador (diario) -->
+  <script src="js/journal.js"></script>
+
+  <!-- 6. Entidades del mundo (pollos, árboles, piedras, recogibles) -->
+  <script src="js/entities.js"></script>
+
+  <!-- 7. Reglas de crafting y cooldowns -->
+  <script src="js/crafting.js"></script>
+
+  <!-- 8. Panel visual de crafting animado -->
+  <script src="js/craftpanel.js"></script>
+
+  <!-- 9. Personaje autónomo (usa todo lo anterior) -->
+  <script src="js/player.js"></script>
+
+  <!-- 10. Inventario (usa pixelfont) -->
+  <script src="js/inventory.js"></script>
+
+  <!-- 11. Panel de debug (usa ITEMS, craftFailCooldowns, pixelfont) -->
+  <script src="js/debug.js"></script>
+
+  <!-- 12. Bucle principal y render (usa TODO) -->
+  <script src="js/main.js"></script>
+</body>
+</html>
